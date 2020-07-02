@@ -251,7 +251,7 @@ class DCGAN(object):
                 half_batch = self.batch_size // 2
                 real_x, _ = next(self.train_generator)
                 while real_x.shape[0] != half_batch:
-                    real_x, _ = next(train_generator)
+                    real_x, _ = next(self.train_generator)
                 noise = np.random.normal(0, 1, (half_batch, self.z_dim))
                 fake_x = self.generator.predict(noise)
                 real_y = np.ones(half_batch)
@@ -264,7 +264,7 @@ class DCGAN(object):
 
 
                 # write summary
-                self.write_log(tensorboard_callback, scalar_names, [d_loss, g_loss], self.counter)
+                # self.write_log(tensorboard_callback, scalar_names, [d_loss, g_loss], self.counter)
 
                 # display training status
                 self.counter += 1
@@ -289,13 +289,26 @@ class DCGAN(object):
 
             # After an epoch, start_batch_id is set to zero
             # non-zero value is only for the first epoch after loading pre-trained model
-            start_batch_id = 0
+            self.start_batch_id = 0
 
             # save model
             self.save(self.checkpoint_dir,  self.counter)
 
         # save model for the final step
         self.save(self.checkpoint_dir,  self.counter)
+
+
+    def load_pretrained_model(self):
+        could_load, checkpoint_counter = self.load_models(self.checkpoint_dir)
+        if could_load:
+            print(" [*] Load SUCCESS")
+        else:
+            print(" [!] Load failed...")
+        return checkpoint_counter
+        
+
+    def predict(self, z_noise):
+        return self.generator.predict(z_noise)
 
 
     @property

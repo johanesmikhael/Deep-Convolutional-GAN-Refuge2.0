@@ -7,6 +7,7 @@ from tensorflow.keras.applications.inception_v3 import preprocess_input
 import time
 import matplotlib.pyplot as plt
 import imageio
+import numpy as np
 
 
 
@@ -96,6 +97,7 @@ def load_data(dataset_name, size=64, rotation=0, crop_pos='center', zoom_range=0
 
 def save_images_plt(images, size, image_path, mode=None):
     images = inverse_transform(images)
+    images = to_uint8(images)
     if mode == 'sample':
         h = 10
     else:
@@ -131,5 +133,13 @@ def save_images_plt(images, size, image_path, mode=None):
     plt.savefig(image_path)
     plt.close()
 
+def save_image(image, image_path):
+    image = inverse_transform(image)
+    image = to_uint8(image)
+    imageio.imwrite(image_path, image)
+
 def inverse_transform(images):
     return (images+1.)/2.
+
+def to_uint8(images):
+    return (images * 255).astype(np.uint8)
